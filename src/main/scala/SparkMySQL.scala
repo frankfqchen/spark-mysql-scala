@@ -15,24 +15,30 @@ import org.joda.time.{DateTime, _}
 
 object SparkMySQL {
   val username = "root"
-  val password = ""
+  val password = "root"
   val db = "my_awesome_db"
   val table = "test_json"
   val field = "json"
   val url = "jdbc:mysql://localhost"
   var localOutputFile = "prepared_mysql_data"
   var sc: SparkContext = null
+  var connection: Connection = null
+  var startTime: DateTime  = null
+  var endTime: DateTime  = null
+  val numOfRecordsToCreate = 1000000
 
   def main(args: Array[String]): Unit = {
     setupSpark
     createDB
+
+    setupConnection
+
     createTable
     sparkWriteDataToDisk
     insertData
     cleanUp
 
-
-    // close connection
+    printTimeTake
   }
 
   def setupSpark(): Unit = {
@@ -47,17 +53,20 @@ object SparkMySQL {
   def createDB(): Unit = {
     val connection = DriverManager.getConnection(url, username, password)
     connection.createStatement.executeUpdate(s"CREATE DATABASE IF NOT EXISTS ${db}")
+    connection.close
+  }
+
+  def setupConnection(): Unit = {
+    connection = DriverManager.getConnection(s"${url}/${db}", username, password)
   }
 
   def createTable(): Unit = {
-    val connection = DriverManager.getConnection(s"${url}/${db}", username, password)
-
     connection.createStatement.executeUpdate(
       s""" CREATE TABLE IF NOT EXISTS ${table} (
       |   id INTEGER NOT NULL AUTO_INCREMENT,
       |   ${field} TEXT,
       |   PRIMARY KEY ( id )
-      |   )
+      |   );
       |   """.stripMargin
     )
   }
@@ -68,20 +77,33 @@ object SparkMySQL {
   }
 
   def sparkWriteDataToDisk(): Unit = {
-    val collection = sc.parallelize(createRandomJson(1000000))
+    val data = createRandomJson(numOfRecordsToCreate)
+
+    val collection = sc.parallelize(data)
     collection.saveAsTextFile(localOutputFile)
   }
 
   def insertData(): Unit = {
-    val connection = DriverManager.getConnection(s"${url}/${db}", username, password)
+    // start timing...
+    startTime = DateTime.now
 
     connection.createStatement.executeUpdate(
       s"""LOAD DATA LOCAL INFILE '${localOutputFile}/part-00000' INTO TABLE ${table} (${field})"""
     )
+
+    // stop timing...
+    endTime = DateTime.now
   }
 
   def cleanUp(): Unit = {
     sc.stop
+    connection.close
     Path.fromString(s"./${localOutputFile}").deleteRecursively(continueOnFailure = true)
+  }
+
+  def printTimeTake(): Unit = {
+    println("*"*100)
+    println(s"Time taken : ${(endTime.getMillis - startTime.getMillis)/1000} seconds to insert ${numOfRecordsToCreate} records")
+    println("*"*100)
   }
 }
