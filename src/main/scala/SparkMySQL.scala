@@ -103,11 +103,12 @@ object SparkMySQL {
       .option("password", password)
 
     var readResults = new ArrayBuffer[String]()
+    val result = df.option("dbtable", table).load()
 
     for(limit <- List[Int](100, 1000, 100000, 1000000)) {
       val readStartTime = DateTime.now
 
-      val result = df.option("dbtable", s"select id from ${table} limit ${limit}").load()
+      result.limit(limit).collect()
 
       val readEndTime = DateTime.now
 
