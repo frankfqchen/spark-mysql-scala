@@ -19,6 +19,17 @@ Time Taken : 5 seconds to read 100000 records
 Time Taken : 10 seconds to read 1000000 records
 ```
 
+## MOTIVATION - why MySQL?
+Amazon AuroraDB is a new Cost-Effective MySQL-Compatible database engine for Amazon RDS which is claimed to be **5X faster** than regular MySQL.  So whatever numbers shown here, you can conceivably multiply them by 5*
+
+You can read about [AuroraDB here](https://aws.amazon.com/blogs/aws/highly-scalable-mysql-compat-rds-db-engine/)
+
+
+
+
+
+\* common sense required
+
 ## MY ENV
 ```
 1 Spark cluster
