@@ -2,15 +2,13 @@ package jdbc
 
 import java.sql.DriverManager
 import java.sql.Connection
+
 import scalax.file.Path
-
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark._
-import com.datastax.spark.connector._
-
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
-import scala.util.parsing.json._
+import org.apache.spark.sql.SparkSession
 import org.joda.time.{DateTime, _}
+
+import scala.collection.mutable.ArrayBuffer
 
 
 object SparkMySQL {
@@ -37,6 +35,8 @@ object SparkMySQL {
     sparkWriteDataToDisk
     insertData
     cleanUp
+
+    readData
 
     printTimeTake
   }
@@ -79,20 +79,42 @@ object SparkMySQL {
   def sparkWriteDataToDisk(): Unit = {
     val data = createRandomJson(numOfRecordsToCreate)
 
+    // start timing...
+    startTime = DateTime.now
+
     val collection = sc.parallelize(data)
     collection.saveAsTextFile(localOutputFile)
   }
 
   def insertData(): Unit = {
-    // start timing...
-    startTime = DateTime.now
-
     connection.createStatement.executeUpdate(
       s"""LOAD DATA LOCAL INFILE '${localOutputFile}/part-00000' INTO TABLE ${table} (${field})"""
     )
 
     // stop timing...
     endTime = DateTime.now
+  }
+
+  def readData(): Unit = {
+    val sparkSession = SparkSession.builder().master("local").appName("Sexy Boom Thang").getOrCreate()
+    val df = sparkSession.read.format("jdbc")
+      .option("url", url)
+      .option("user", username)
+      .option("password", password)
+
+    var readResults = new ArrayBuffer[String]()
+
+    for(limit <- List[Int](100, 1000, 100000, 1000000)) {
+      val readStartTime = DateTime.now
+
+      val result = df.option("dbtable", s"select id from ${table} limit ${limit}").load()
+
+      val readEndTime = DateTime.now
+
+      readResults += s"Time Taken : ${(readEndTime.getMillis - readStartTime.getMillis)/1000} seconds to read ${result.count} records"
+    }
+
+    readResults.foreach(println)
   }
 
   def cleanUp(): Unit = {
