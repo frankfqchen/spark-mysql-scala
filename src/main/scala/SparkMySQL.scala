@@ -113,6 +113,8 @@ object SparkMySQL {
     }
 
     readResults.foreach(println)
+
+    sparkSession.stop
   }
 
   def cleanUp(): Unit = {

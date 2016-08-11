@@ -30,8 +30,8 @@ RUN apt-get -y install mysql-server
 
 EXPOSE 3306
 
-COPY . /root
-
 WORKDIR /root
+
+COPY . /root
 
 CMD bash -C 'run.sh';'bash'
