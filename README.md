@@ -1,3 +1,5 @@
+![FASTTTTTTTT](logo.png)
+
 # Spark-MySQL-Scala benchmarking
 
 MySQL is pretty fast with spark.  Its actually not is bad, MKAY!
