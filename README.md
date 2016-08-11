@@ -1,6 +1,6 @@
 ![FASTTTTTTTT](logo.png)
 
-# Spark-MySQL-Scala benchmarking
+# Spark-MySQL(/AuroraDB)-Scala benchmarking
 
 MySQL is pretty _fast_ with spark.  Its actually not is bad, MKAY!
 
