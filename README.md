@@ -2,7 +2,7 @@
 
 # Spark-MySQL-Scala benchmarking
 
-MySQL is pretty fast with spark.  Its actually not is bad, MKAY!
+MySQL is pretty _fast_ with spark.  Its actually not is bad, MKAY!
 
 ![FASTTTTTTTT](daim.gif)
 
