@@ -32,7 +32,6 @@ object SparkMySQL {
     setupConnection
 
     createTable
-    sparkWriteDataToDisk
     insertData
     cleanUp
 
@@ -76,7 +75,7 @@ object SparkMySQL {
     List.fill(limit)(exampleJson)
   }
 
-  def sparkWriteDataToDisk(): Unit = {
+  def insertData(): Unit = {
     val data = createRandomJson(numOfRecordsToCreate)
 
     // start timing...
@@ -84,9 +83,7 @@ object SparkMySQL {
 
     val collection = sc.parallelize(data)
     collection.saveAsTextFile(localOutputFile)
-  }
 
-  def insertData(): Unit = {
     connection.createStatement.executeUpdate(
       s"""LOAD DATA LOCAL INFILE '${localOutputFile}/part-00000' INTO TABLE ${table} (${field})"""
     )
@@ -98,21 +95,21 @@ object SparkMySQL {
   def readData(): Unit = {
     val sparkSession = SparkSession.builder().master("local").appName("Sexy Boom Thang").getOrCreate()
     val df = sparkSession.read.format("jdbc")
-      .option("url", url)
+      .option("url", s"${url}/${db}")
       .option("user", username)
       .option("password", password)
+      .option("dbtable", table)
 
     var readResults = new ArrayBuffer[String]()
-    val result = df.option("dbtable", table).load()
 
     for(limit <- List[Int](100, 1000, 100000, 1000000)) {
       val readStartTime = DateTime.now
 
-      result.limit(limit).collect()
+      val result = df.load.limit(limit).collect()
 
       val readEndTime = DateTime.now
 
-      readResults += s"Time Taken : ${(readEndTime.getMillis - readStartTime.getMillis)/1000} seconds to read ${result.count} records"
+      readResults += s"Time Taken : ${(readEndTime.getMillis - readStartTime.getMillis)/1000} seconds to read ${result.size} records"
     }
 
     readResults.foreach(println)
