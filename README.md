@@ -6,18 +6,21 @@ MySQL is pretty _fast_ with spark.  Its actually not is bad, MKAY!
 
 ![FASTTTTTTTT](daim.gif)
 
-## READS
+## WRITES
 ```
 Time taken : 15 seconds to insert 1000000 records
 ```
 
-## WRITES
+Average of `66,666` inserts a second.  Not bad, MKAY!
+
+## READS
 ```
 Time Taken : 6 seconds to read 100 records
 Time Taken : 6 seconds to read 1000 records
 Time Taken : 5 seconds to read 100000 records
 Time Taken : 10 seconds to read 1000000 records
 ```
+
 
 ## MOTIVATION - why MySQL?
 **Amazon AuroraDB** is a new cost-effective MySQL-compatible database engine for Amazon RDS which is claimed to be **5X faster** than regular MySQL.  So whatever numbers shown here, you can conceivably multiply them by 5*
