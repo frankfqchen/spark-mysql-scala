@@ -11,7 +11,7 @@ MySQL is pretty _fast_ with spark.  Its actually not is bad, MKAY!
 Time taken : 15 seconds to insert 1000000 records
 ```
 
-Average of `66,666` inserts a second.  Not bad, MKAY!
+Roughly of `66,666` inserts a second.  Not bad, MKAY!
 
 ## READS
 ```
