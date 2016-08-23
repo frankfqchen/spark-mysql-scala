@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object SparkMySQL {
   val username = "root"
-  val password = "root"
+  val password = "rootpassword"
   val db = "my_awesome_db"
   val table = "test_json"
   val field = "json"
